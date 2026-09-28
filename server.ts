@@ -91,8 +91,8 @@ const app = express();
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // Support high resolution photo uploads across devices
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '150mb' }));
+app.use(express.urlencoded({ limit: '150mb', extended: true }));
 
 // Set up HTTP Server
 const server = http.createServer(app);
@@ -173,7 +173,8 @@ function handlePhotoUpdate(payload: { monthId: number; photoId: string; url: str
         if (ext === 'jpeg') ext = 'jpg';
         if (ext.includes('svg')) ext = 'svg';
         const base64Data = match[2];
-        const filename = `photo_m${monthId}_${photoId}_${Date.now()}.${ext}`;
+        const randomSuffix = Math.random().toString(36).substring(2, 7);
+        const filename = `photo_m${monthId}_${photoId}_${Date.now()}_${randomSuffix}.${ext}`;
         const filePath = path.join(UPLOADS_DIR, filename);
         fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
         finalUrl = `/uploads/${filename}`;
@@ -254,9 +255,9 @@ app.post('/api/photos', (req, res) => {
   res.json({ success: true, photo: result });
 });
 
-// Batch sync for syncing local IndexedDB photos to server
+// Batch sync for syncing local IndexedDB photos to server or bulk uploads
 app.post('/api/photos/batch', (req, res) => {
-  const { photos } = req.body;
+  const { photos, overwrite = true } = req.body;
   if (!Array.isArray(photos)) {
     res.status(400).json({ error: 'Expected array of photos' });
     return;
@@ -266,14 +267,26 @@ app.post('/api/photos/batch', (req, res) => {
   for (const item of photos) {
     if (item.monthId && item.photoId && item.url) {
       const key = `${item.monthId}_${item.photoId}`;
-      if (!photosState[key]) {
+      if (overwrite || !photosState[key]) {
         handlePhotoUpdate(item);
         updatedCount++;
       }
     }
   }
 
+  broadcast({
+    type: 'photos_sync',
+    payload: photosState,
+  });
+
   res.json({ success: true, count: updatedCount, photos: photosState });
+});
+
+app.post('/api/photos/reset', (_req, res) => {
+  photosState = {};
+  savePhotosToDisk();
+  broadcast({ type: 'photos_sync', payload: {} });
+  res.json({ success: true, message: 'Photos reset to initial state' });
 });
 
 // REST API Endpoints for Scores

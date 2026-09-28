@@ -1,13 +1,49 @@
 import { Letter, MonthAlbum, Song, FutureMilestone, BucketItem } from '../types';
-import month1Photo1 from '../assets/images/month1_first_selfie_1790608559310.jpg';
-import month1Photo2 from '../assets/images/month1_second_selfie_1790608571574.jpg';
-import month1Photo3 from '../assets/images/month1_agreement_chat_1790608582051.jpg';
-import month2Photo1 from '../assets/images/regenerated_image_1790089300169.png';
-import month2Photo2 from '../assets/images/regenerated_image_1790089300648.png';
-import month2Photo3 from '../assets/images/regenerated_image_1790089301749.png';
-import month3Photo1 from '../assets/images/month3_funny_selfie_1790101333612.jpg';
-import month3Photo2 from '../assets/images/month3_fluffy_coat_1790101355205.jpg';
-import month3Photo3 from '../assets/images/month3_evening_leather_1790101373050.jpg';
+
+// Month 1 - Decembrie 2025
+import m1Photo1 from '../assets/images/m1_dec_1.png';
+import m1Photo2 from '../assets/images/m1_dec_2.png';
+import m1Photo3 from '../assets/images/m1_dec_3.png';
+
+// Month 2 - Ianuarie 2026
+import m2Photo1 from '../assets/images/m2_jan_1.png';
+import m2Photo2 from '../assets/images/m2_jan_2.png';
+import m2Photo3 from '../assets/images/m2_jan_3.png';
+
+// Month 3 - Februarie 2026
+import m3Photo1 from '../assets/images/m3_feb_1.png';
+import m3Photo2 from '../assets/images/m3_feb_2.png';
+import m3Photo3 from '../assets/images/m3_feb_3.png';
+
+// Month 4 - Martie 2026
+import m4Photo1 from '../assets/images/m4_mar_1.png';
+import m4Photo2 from '../assets/images/m4_mar_2.jpg';
+import m4Photo3 from '../assets/images/m4_mar_3.jpg';
+
+// Month 5 - Aprilie 2026
+import m5Photo1 from '../assets/images/m5_apr_1.jpg';
+import m5Photo2 from '../assets/images/m5_apr_2.jpg';
+import m5Photo3 from '../assets/images/m5_apr_3.jpg';
+
+// Month 6 - Mai 2026
+import m6Photo1 from '../assets/images/m6_may_1.jpg';
+import m6Photo2 from '../assets/images/m6_may_2.jpg';
+import m6Photo3 from '../assets/images/m6_may_3.jpg';
+
+// Month 7 - Iunie 2026
+import m7Photo1 from '../assets/images/m7_jun_1.jpg';
+import m7Photo2 from '../assets/images/m7_jun_2.jpg';
+import m7Photo3 from '../assets/images/m7_jun_3.jpg';
+
+// Month 8 - Iulie 2026
+import m8Photo1 from '../assets/images/m8_jul_1.jpg';
+import m8Photo2 from '../assets/images/m8_jul_2.jpg';
+import m8Photo3 from '../assets/images/m8_jul_3.jpg';
+
+// Month 9 - August & Septembrie 2026
+import m9Photo1 from '../assets/images/m9_aug_1.jpg';
+import m9Photo2 from '../assets/images/m9_sep_1.jpg';
+import m9Photo3 from '../assets/images/m9_sep_2.jpg';
 
 export const RELATIONSHIP_START_DATE = '2025-12-22T00:00:00';
 export const CORRECT_SAFE_PIN = '2212';
@@ -109,19 +145,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'dec-1',
         caption: 'Primele noastre poze împreună — primele noastre zâmbete și priviri dulci din Decembrie 2025 📸❤️',
         dateText: 'Decembrie 2025',
-        url: month1Photo1,
+        url: m1Photo1,
       },
       {
         id: 'dec-2',
         caption: 'Primele noastre poze împreună — momente de neuitat și căldură sufletească la începutul poveștii 🥰✨',
         dateText: 'Decembrie 2025',
-        url: month1Photo2,
+        url: m1Photo2,
       },
       {
         id: 'dec-3',
         caption: 'Aici ai fost de acord ca The only man beside me sa fie kota, and good girl ca te tii de promisiune 🐾💖',
         dateText: 'Decembrie 2025',
-        url: month1Photo3,
+        url: m1Photo3,
       },
     ],
   },
@@ -137,19 +173,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'jan-1',
         caption: 'Ala a fost primul nostru story pe instagram 📱❤️',
         dateText: 'Ianuarie 2026',
-        url: month2Photo1,
+        url: m2Photo1,
       },
       {
         id: 'jan-2',
         caption: 'Aici muream de frig amandoi dar ne iubeam neconditionat ❄️🧣❤️',
         dateText: 'Ianuarie 2026',
-        url: month2Photo2,
+        url: m2Photo2,
       },
       {
         id: 'jan-3',
         caption: 'Poza asta nu ti a placut dar eu tot o pun ca mie mi place 😜🥰💖',
         dateText: 'Ianuarie 2026',
-        url: month2Photo3,
+        url: m2Photo3,
       },
     ],
   },
@@ -165,19 +201,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'feb-1',
         caption: 'Aici eram la mall ca afara ne era frig, uite ce frumosi suntem 🛍️🥶🥰✨',
         dateText: 'Februarie 2026',
-        url: month3Photo1,
+        url: m3Photo1,
       },
       {
         id: 'feb-2',
         caption: 'Aici ti-ai luat blanita pe tine, sa fii extra extra hottie ca faceam poze de story 🧥💅🔥💖',
         dateText: 'Februarie 2026',
-        url: month3Photo2,
+        url: m3Photo2,
       },
       {
         id: 'feb-3',
         caption: 'Aiciiii ne am petrecut primul Valentines Day impreuna. I love you, my Valentine! 💘🌹💌✨',
         dateText: 'Februarie 2026',
-        url: month3Photo3,
+        url: m3Photo3,
       },
     ],
   },
@@ -193,19 +229,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'mar-1',
         caption: 'Aiciii ti am dat martisooor 🌸🌷🎀🤍',
         dateText: 'Martie 2026',
-        url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=600&q=80',
+        url: m4Photo1,
       },
       {
         id: 'mar-2',
         caption: 'Aici faceam again poze de story, we were matchy aswell, like our souls matched 📸👯‍♀️💫💕',
         dateText: 'Martie 2026',
-        url: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=600&q=80',
+        url: m4Photo2,
       },
       {
         id: 'mar-3',
         caption: 'Inainte sa facem poza, ne-am certat, dar ne-am impacat, like we always do, because we were slowly learning to choose eachother no mather what 🥺❤️🩹🤞💖',
         dateText: 'Martie 2026',
-        url: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+        url: m4Photo3,
       },
     ],
   },
@@ -221,19 +257,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'apr-1',
         caption: 'Aiciiii am fost prima data la tine AND I WAS SHITTING MY PANTS ca ti-am cunoscut toata familia, dar am lasat o impresie buna and Im glad for it 🫣😅🏡💖',
         dateText: 'Aprilie 2026',
-        url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=600&q=80',
+        url: m5Photo1,
       },
       {
         id: 'apr-2',
         caption: 'Aici a cerut mother poza cu noi, UITE CE DRAGUTI SUNTEEEMMM 🥹📸👩‍👦💕✨',
         dateText: 'Aprilie 2026',
-        url: 'https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=600&q=80',
+        url: m5Photo2,
       },
       {
         id: 'apr-3',
         caption: 'Aici ai fost TU prima data la mine, si tot atunci a fost the first time when we got intimate and si ne-am aratat unul altuia cat de multa incredere avem unul in altul. I love you pretty! 🫂🧸🔐❤️',
         dateText: 'Aprilie 2026',
-        url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
+        url: m5Photo3,
       },
     ],
   },
@@ -249,19 +285,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'may-1',
         caption: 'Again poza de storyy, but de pe telefonul meu hehehee 📱📸😋✌️',
         dateText: 'Mai 2026',
-        url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+        url: m6Photo1,
       },
       {
         id: 'may-2',
         caption: 'Aici again la mall, prima data caaand ai purtat geaca ta de blug cu sclipicele hehehe 🧥✨🛍️🥰',
         dateText: 'Mai 2026',
-        url: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?auto=format&fit=crop&w=600&q=80',
+        url: m6Photo2,
       },
       {
         id: 'may-3',
         caption: 'WALL-E and EVA 🤖🌱💕🚀',
         dateText: 'Mai 2026',
-        url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80',
+        url: m6Photo3,
       },
     ],
   },
@@ -277,19 +313,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'jun-1',
         caption: 'Aici m-ai vazut prima data mort de beat, dar te-ai imbatat si tu hehehe 🍻🤪🥴❤️',
         dateText: 'Iunie 2026',
-        url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+        url: m7Photo1,
       },
       {
         id: 'jun-2',
         caption: 'Doi indragostiti pe o banca langa dig 🌊🪑🌅💑✨',
         dateText: 'Iunie 2026',
-        url: 'https://images.unsplash.com/photo-1510525009512-ad7fc0c01117?auto=format&fit=crop&w=600&q=80',
+        url: m7Photo2,
       },
       {
         id: 'jun-3',
         caption: 'Aici a adormit pestele cel mare in bratele mele 🐟😴🧸💤💕',
         dateText: 'Iunie 2026',
-        url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
+        url: m7Photo3,
       },
     ],
   },
@@ -305,19 +341,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'jul-1',
         caption: 'Aiciii ti am ales rochita pentru majoraaat 👗👑✨😍',
         dateText: 'Iulie 2026',
-        url: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80',
+        url: m8Photo1,
       },
       {
         id: 'jul-2',
         caption: 'Aici eram doi frumosi indragostiti care mergeau la majorat impreunaaa 💃🕺🥂🎉💖',
         dateText: 'Iulie 2026',
-        url: 'https://images.unsplash.com/photo-1532767153582-b1a0e5145009?auto=format&fit=crop&w=600&q=80',
+        url: m8Photo2,
       },
       {
         id: 'jul-3',
         caption: 'FIRST TIME COOKING TOGETHEEERR (moments before disaster...) 👩‍🍳🍳🔥😂🍝',
         dateText: 'Iulie 2026',
-        url: 'https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80',
+        url: m8Photo3,
       },
     ],
   },
@@ -333,19 +369,19 @@ export const INITIAL_MONTHS: MonthAlbum[] = [
         id: 'aug-1',
         caption: 'AICIII A FOST MY 18TH BIRTHDAYY, THANK YOU FOR THE GIFTT BON BON 🎂🎁🔞🎉❤️',
         dateText: 'August 2026',
-        url: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
+        url: m9Photo1,
       },
       {
         id: 'sep-1',
         caption: 'Aici cu iubirea vietii mele eram la Aqua 🌊🏊‍♂️💦☀️👙🥰',
         dateText: 'August 2026',
-        url: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=600&q=80',
+        url: m9Photo2,
       },
       {
         id: 'sep-2',
         caption: 'Aici a fost ziua fetitei mele, LA MULTI ANI BON BONNN!!! 🥳🎂👑💖🎀✨',
         dateText: 'August 2026',
-        url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80',
+        url: m9Photo3,
       },
     ],
   },

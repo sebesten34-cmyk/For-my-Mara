@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Camera, Heart, Sparkles, X, ChevronLeft, ChevronRight, ZoomIn, Upload, Check } from 'lucide-react';
+import { Camera, Heart, Sparkles, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import { MonthAlbum, PhotoItem } from '../types';
 import { INITIAL_MONTHS } from '../data/anniversaryData';
-import { loadSavedAlbums, saveAlbumsToStorage, readFileAsDataUrl } from '../utils/photoStorage';
+import { loadSavedAlbums } from '../utils/photoStorage';
 import { crossDevicePhotos } from '../services/crossDevicePhotos';
 import { HelloKittyFace, HelloKittyBow } from './HelloKittyVector';
 import { triggerHeartExplosion } from '../utils/confetti';
@@ -13,9 +13,6 @@ export const PhotoAlbumSection: React.FC = () => {
   const [months, setMonths] = useState<MonthAlbum[]>(() => crossDevicePhotos.mergeWithServerPhotos(INITIAL_MONTHS));
   const [activeMonthId, setActiveMonthId] = useState<number>(1); // Default to Month 1 (Decembrie 2025)
   const [selectedPhoto, setSelectedPhoto] = useState<{ photo: PhotoItem; monthName: string; monthId: number } | null>(null);
-  const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Load persistent photos from server (synced across all devices) & IndexedDB
   useEffect(() => {
@@ -45,62 +42,6 @@ export const PhotoAlbumSection: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedPhoto) return;
-
-    try {
-      setIsUploading(true);
-      const dataUrl = await readFileAsDataUrl(file);
-
-      const updatedMonths = months.map((m) => {
-        if (m.id !== selectedPhoto.monthId) return m;
-        return {
-          ...m,
-          photos: m.photos.map((p) => {
-            if (p.id !== selectedPhoto.photo.id) return p;
-            return {
-              ...p,
-              url: dataUrl,
-              isCustom: true,
-            };
-          }) as [PhotoItem, PhotoItem, PhotoItem],
-        };
-      });
-
-      setMonths(updatedMonths);
-
-      // Save locally to IndexedDB
-      await saveAlbumsToStorage(updatedMonths);
-
-      // Save cross-device to server so ALL devices (Mara's phone, Dominik's phone, etc.) see it instantly!
-      await crossDevicePhotos.savePhoto(selectedPhoto.monthId, selectedPhoto.photo.id, dataUrl);
-
-      setSelectedPhoto((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          photo: {
-            ...prev.photo,
-            url: dataUrl,
-            isCustom: true,
-          },
-        };
-      });
-
-      setUploadSuccess(true);
-      triggerHeartExplosion(window.innerWidth / 2, window.innerHeight / 2);
-      setTimeout(() => setUploadSuccess(false), 3000);
-    } catch (err) {
-      console.error('Error saving uploaded photo:', err);
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
-
   const currentMonth = months.find((m) => m.id === activeMonthId) || months[0];
 
   return (
@@ -122,8 +63,10 @@ export const PhotoAlbumSection: React.FC = () => {
         {/* Real-time sync badge */}
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mt-3 shadow-xs">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Sincronizare Live: Pozele încărcate apar instantaneu pe ambele telefoane (Mara & Dominik) 📱💕</span>
+          <span>Sincronizare Live: Activă pe ambele telefoane (Mara & Dominik) 📱💕</span>
         </div>
+
+
 
         {/* 9 Months Navigation Selector */}
         <div className="flex items-center justify-start sm:justify-center gap-2 mt-6 overflow-x-auto pb-2 scrollbar-none">
@@ -272,6 +215,18 @@ export const PhotoAlbumSection: React.FC = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Card Action Bar */}
+                <div className="mt-3.5 pt-2.5 border-t border-pink-100 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPhoto({ photo, monthName: currentMonth.monthName, monthId: currentMonth.id })}
+                    className="text-[11px] font-bold text-rose-500 hover:text-rose-700 flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                    <span>Mărește</span>
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -327,35 +282,6 @@ export const PhotoAlbumSection: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="px-3.5 py-2 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-800 font-bold text-xs flex items-center gap-1.5 shadow-sm border border-pink-300 cursor-pointer transition-transform active:scale-95"
-                    title="Încarcă fișierul PNG original de pe dispozitivul tău"
-                  >
-                    {uploadSuccess ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700">Poză salvată pentru totdeauna!</span>
-                      </>
-                    ) : isUploading ? (
-                      <span>Se salvează...</span>
-                    ) : (
-                      <>
-                        <Upload className="w-3.5 h-3.5 text-pink-600" />
-                        <span>Schimbă cu poza originală (PNG/JPG)</span>
-                      </>
-                    )}
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleUploadFile}
-                  />
-
-                  <button
-                    type="button"
                     onClick={(e) => triggerHeartExplosion(e.clientX, e.clientY)}
                     className="px-4 py-2 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-rose-200 cursor-pointer transition-transform active:scale-95"
                   >
@@ -377,6 +303,8 @@ export const PhotoAlbumSection: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
+
+
     </section>
   );
 };

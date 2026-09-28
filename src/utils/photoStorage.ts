@@ -6,7 +6,7 @@
 import { MonthAlbum, PhotoItem } from '../types';
 import { INITIAL_MONTHS } from '../data/anniversaryData';
 
-const DB_NAME = 'DominikMaraPhotosDB';
+const DB_NAME = 'DominikMaraPhotosDB_v2';
 const DB_VERSION = 1;
 const STORE_NAME = 'albums';
 const ALBUM_RECORD_KEY = 'photo_months_data';

@@ -121,6 +121,42 @@ class CrossDevicePhotoService {
     return true;
   }
 
+  public async uploadBatch(photos: { monthId: number; photoId: string; url: string }[]): Promise<boolean> {
+    try {
+      const res = await fetch('/api/photos/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photos, overwrite: true }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.photos) {
+          this.photosMap = data.photos;
+          this.notifyListeners();
+          return true;
+        }
+      }
+    } catch (err) {
+      console.error('Error during batch upload:', err);
+    }
+    return false;
+  }
+
+  public async resetPhotos(): Promise<boolean> {
+    try {
+      const res = await fetch('/api/photos/reset', { method: 'POST' });
+      if (res.ok) {
+        this.photosMap = {};
+        this.notifyListeners();
+        return true;
+      }
+    } catch (err) {
+      console.error('Error resetting photos:', err);
+    }
+    return false;
+  }
+
   /**
    * Applies server photos onto a list of MonthAlbums
    */
