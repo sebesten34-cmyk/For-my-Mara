@@ -1,0 +1,6 @@
+{
+  "name": "Dominik & Mara - 9 Luni Împreună",
+  "description": "Site de aniversare de 9 luni pentru Dominik și Mara - o călătorie plină de dragoste, temă Hello Kitty, scrisori, poze și planuri de viitor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
