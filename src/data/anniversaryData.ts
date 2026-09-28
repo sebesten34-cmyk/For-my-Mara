@@ -1,10 +1,10 @@
 import { Letter, MonthAlbum, Song, FutureMilestone, BucketItem } from '../types';
-import month1Photo1 from '../assets/images/regenerated_image_1790089300169.png';
-import month1Photo2 from '../assets/images/regenerated_image_1790089300648.png';
-import month1Photo3 from '../assets/images/regenerated_image_1790089301749.png';
-import month2Photo1 from '../assets/images/month2_winter_hug_1790101232285.jpg';
-import month2Photo2 from '../assets/images/month2_night_smile_1790101248685.jpg';
-import month2Photo3 from '../assets/images/month2_mirror_candid_1790101266328.jpg';
+import month1Photo1 from '../assets/images/month1_first_selfie_1790608559310.jpg';
+import month1Photo2 from '../assets/images/month1_second_selfie_1790608571574.jpg';
+import month1Photo3 from '../assets/images/month1_agreement_chat_1790608582051.jpg';
+import month2Photo1 from '../assets/images/regenerated_image_1790089300169.png';
+import month2Photo2 from '../assets/images/regenerated_image_1790089300648.png';
+import month2Photo3 from '../assets/images/regenerated_image_1790089301749.png';
 import month3Photo1 from '../assets/images/month3_funny_selfie_1790101333612.jpg';
 import month3Photo2 from '../assets/images/month3_fluffy_coat_1790101355205.jpg';
 import month3Photo3 from '../assets/images/month3_evening_leather_1790101373050.jpg';

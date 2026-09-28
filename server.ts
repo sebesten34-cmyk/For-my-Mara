@@ -12,10 +12,15 @@ const __dirname = path.dirname(__filename);
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const DATA_DIR = path.resolve(__dirname, 'data');
 const SCORES_FILE = path.join(DATA_DIR, 'scores.json');
+const PHOTOS_FILE = path.join(DATA_DIR, 'photos.json');
+const UPLOADS_DIR = path.resolve(__dirname, 'public', 'uploads');
 
-// Ensure data folder exists
+// Ensure data and uploads folders exist
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
 // Initial state
@@ -60,8 +65,34 @@ function saveScoresToDisk() {
   }
 }
 
+// Persistent Photo Overrides for Cross-Device Synchronization
+type PhotosMap = Record<string, { monthId: number; photoId: string; url: string; updatedAt: string }>;
+let photosState: PhotosMap = {};
+
+try {
+  if (fs.existsSync(PHOTOS_FILE)) {
+    const raw = fs.readFileSync(PHOTOS_FILE, 'utf-8');
+    photosState = JSON.parse(raw) || {};
+  }
+} catch (err) {
+  console.warn('Could not load existing photos.json, using empty map:', err);
+}
+
+function savePhotosToDisk() {
+  try {
+    fs.writeFileSync(PHOTOS_FILE, JSON.stringify(photosState, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to save photos to disk:', err);
+  }
+}
+
 const app = express();
-app.use(express.json());
+// Serve uploaded images statically
+app.use('/uploads', express.static(UPLOADS_DIR));
+
+// Support high resolution photo uploads across devices
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Set up HTTP Server
 const server = http.createServer(app);
@@ -99,8 +130,9 @@ function broadcast(event: { type: string; payload: any }) {
 wss.on('connection', (ws) => {
   connectedClients.add(ws);
 
-  // Send current state immediately on connect
+  // Send current state and photos immediately on connect
   ws.send(JSON.stringify({ type: 'init', payload: state }));
+  ws.send(JSON.stringify({ type: 'init_photos', payload: photosState }));
 
   ws.on('message', (raw) => {
     try {
@@ -109,6 +141,8 @@ wss.on('connection', (ws) => {
         handleScoreSubmission(msg.payload);
       } else if (msg.type === 'cheer') {
         broadcast({ type: 'live_cheer', payload: msg.payload });
+      } else if (msg.type === 'update_photo') {
+        handlePhotoUpdate(msg.payload);
       }
     } catch (e) {
       console.warn('Invalid WS message received:', e);
@@ -123,6 +157,50 @@ wss.on('connection', (ws) => {
     connectedClients.delete(ws);
   });
 });
+
+function handlePhotoUpdate(payload: { monthId: number; photoId: string; url: string }) {
+  const { monthId, photoId, url } = payload;
+  if (!monthId || !photoId || !url) return null;
+
+  let finalUrl = String(url);
+
+  // If the photo was sent as a base64 Data URL, write it to public/uploads disk as an actual image file
+  if (finalUrl.startsWith('data:image/')) {
+    try {
+      const match = finalUrl.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+      if (match) {
+        let ext = match[1].toLowerCase();
+        if (ext === 'jpeg') ext = 'jpg';
+        if (ext.includes('svg')) ext = 'svg';
+        const base64Data = match[2];
+        const filename = `photo_m${monthId}_${photoId}_${Date.now()}.${ext}`;
+        const filePath = path.join(UPLOADS_DIR, filename);
+        fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+        finalUrl = `/uploads/${filename}`;
+        console.log(`Saved uploaded photo to disk: ${finalUrl}`);
+      }
+    } catch (err) {
+      console.warn('Could not save base64 photo to uploads dir, retaining dataUrl:', err);
+    }
+  }
+
+  const key = `${monthId}_${photoId}`;
+  photosState[key] = {
+    monthId: Number(monthId),
+    photoId: String(photoId),
+    url: finalUrl,
+    updatedAt: new Date().toISOString(),
+  };
+
+  savePhotosToDisk();
+
+  broadcast({
+    type: 'photo_updated',
+    payload: photosState[key],
+  });
+
+  return photosState[key];
+}
 
 function handleScoreSubmission(payload: { game: GameType; player: PlayerName; score: number }) {
   const { game, player, score } = payload;
@@ -162,7 +240,43 @@ function handleScoreSubmission(payload: { game: GameType; player: PlayerName; sc
   return broadcastPayload;
 }
 
-// REST API Endpoints
+// REST API Endpoints for Photos (Cross-Device Sync)
+app.get('/api/photos', (_req, res) => {
+  res.json(photosState);
+});
+
+app.post('/api/photos', (req, res) => {
+  const result = handlePhotoUpdate(req.body);
+  if (!result) {
+    res.status(400).json({ error: 'Missing monthId, photoId, or url' });
+    return;
+  }
+  res.json({ success: true, photo: result });
+});
+
+// Batch sync for syncing local IndexedDB photos to server
+app.post('/api/photos/batch', (req, res) => {
+  const { photos } = req.body;
+  if (!Array.isArray(photos)) {
+    res.status(400).json({ error: 'Expected array of photos' });
+    return;
+  }
+
+  let updatedCount = 0;
+  for (const item of photos) {
+    if (item.monthId && item.photoId && item.url) {
+      const key = `${item.monthId}_${item.photoId}`;
+      if (!photosState[key]) {
+        handlePhotoUpdate(item);
+        updatedCount++;
+      }
+    }
+  }
+
+  res.json({ success: true, count: updatedCount, photos: photosState });
+});
+
+// REST API Endpoints for Scores
 app.get('/api/scores', (_req, res) => {
   res.json(state);
 });
@@ -193,8 +307,9 @@ app.get('/api/scores/stream', (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders?.();
 
-  // Send initial state
+  // Send initial state & photos
   res.write(`data: ${JSON.stringify({ type: 'init', payload: state })}\n\n`);
+  res.write(`data: ${JSON.stringify({ type: 'init_photos', payload: photosState })}\n\n`);
 
   sseClients.add(res);
 
@@ -204,7 +319,7 @@ app.get('/api/scores/stream', (req, res) => {
 });
 
 async function setupApp() {
-  const isDev = process.env.NODE_ENV !== 'production' && !fs.existsSync(path.resolve(__dirname, 'dist', 'index.html'));
+  const isDev = process.env.NODE_ENV !== 'production';
 
   if (isDev) {
     const { createServer: createViteServer } = await import('vite');

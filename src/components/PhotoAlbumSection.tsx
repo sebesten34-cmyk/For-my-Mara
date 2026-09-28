@@ -4,25 +4,34 @@ import { Camera, Heart, Sparkles, X, ChevronLeft, ChevronRight, ZoomIn, Upload, 
 import { MonthAlbum, PhotoItem } from '../types';
 import { INITIAL_MONTHS } from '../data/anniversaryData';
 import { loadSavedAlbums, saveAlbumsToStorage, readFileAsDataUrl } from '../utils/photoStorage';
+import { crossDevicePhotos } from '../services/crossDevicePhotos';
 import { HelloKittyFace, HelloKittyBow } from './HelloKittyVector';
 import { triggerHeartExplosion } from '../utils/confetti';
 import { playHeartPop } from '../utils/audio';
 
 export const PhotoAlbumSection: React.FC = () => {
-  const [months, setMonths] = useState<MonthAlbum[]>(INITIAL_MONTHS);
+  const [months, setMonths] = useState<MonthAlbum[]>(() => crossDevicePhotos.mergeWithServerPhotos(INITIAL_MONTHS));
   const [activeMonthId, setActiveMonthId] = useState<number>(1); // Default to Month 1 (Decembrie 2025)
   const [selectedPhoto, setSelectedPhoto] = useState<{ photo: PhotoItem; monthName: string; monthId: number } | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Load persistent photos from IndexedDB (no quota limit)
+  // Load persistent photos from server (synced across all devices) & IndexedDB
   useEffect(() => {
+    // 1. Initial load from local IndexedDB cache
     loadSavedAlbums().then((loaded) => {
       if (loaded && loaded.length > 0) {
-        setMonths(loaded);
+        setMonths((prev) => crossDevicePhotos.mergeWithServerPhotos(loaded));
       }
     }).catch(console.error);
+
+    // 2. Realtime listener for cross-device photo updates
+    const unsubscribe = crossDevicePhotos.subscribe(() => {
+      setMonths((prev) => crossDevicePhotos.mergeWithServerPhotos(prev));
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // Close lightbox on Escape key
@@ -60,7 +69,12 @@ export const PhotoAlbumSection: React.FC = () => {
       });
 
       setMonths(updatedMonths);
+
+      // Save locally to IndexedDB
       await saveAlbumsToStorage(updatedMonths);
+
+      // Save cross-device to server so ALL devices (Mara's phone, Dominik's phone, etc.) see it instantly!
+      await crossDevicePhotos.savePhoto(selectedPhoto.monthId, selectedPhoto.photo.id, dataUrl);
 
       setSelectedPhoto((prev) => {
         if (!prev) return null;
@@ -104,6 +118,12 @@ export const PhotoAlbumSection: React.FC = () => {
         <p className="text-sm sm:text-base text-pink-700/80 mt-1 max-w-xl mx-auto font-medium">
           9 capitole pline de iubire și amintiri de neuitat, păstrate pentru totdeauna în inima noastră! 💕
         </p>
+
+        {/* Real-time sync badge */}
+        <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold mt-3 shadow-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Sincronizare Live: Pozele încărcate apar instantaneu pe ambele telefoane (Mara & Dominik) 📱💕</span>
+        </div>
 
         {/* 9 Months Navigation Selector */}
         <div className="flex items-center justify-start sm:justify-center gap-2 mt-6 overflow-x-auto pb-2 scrollbar-none">
